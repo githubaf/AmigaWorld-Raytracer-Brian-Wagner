@@ -2,7 +2,7 @@
 
 # rotates the cow
 
-rm amiga_rotation
+rm -f amiga_rotation
 
 for DEG in $(seq 6 12 360 );do
    DEGREES=$(printf %03d "$DEG")
