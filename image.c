@@ -52,6 +52,8 @@ struct RastPort *rp;
 
    ar = (scrw * ((scrh * 4.0) / (scrw * 3.0))) / scrh;
 
+printf("Alexander: Aspect Ratio ar=%f\n",ar);
+
    /* Squeeze width of viewport with aspect ratio value. */
 
    vpx = vopts.vpx * ar;
@@ -61,6 +63,8 @@ struct RastPort *rp;
 
    actw = scrw * vopts.scl;
    acth = scrh * vopts.scl;
+
+printf("Alexander: actw=%d, acth=%d\n",actw,acth);
 
    SetAPen(rp, (LONG)1);
 

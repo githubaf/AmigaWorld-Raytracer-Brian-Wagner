@@ -1,0 +1,129 @@
+10.Sep.2024, AF
+---------------
+
+git clone https://github.com/XenonofArcticus/AmigaWorld-Raytracer-Brian-Wagner.git
+
+
+functions.h is missing, write an own one:
+
+typedef char CHAR;
+#include <exec/types.h>
+#include <stdio.h>
+#include <string.h>
+
+#include <proto/exec.h>
+#include <proto/graphics.h>
+#include <proto/dos.h>
+
+
+m68k-amigaos-gcc -noixemul free.c image.c load.c math.c tracer.c write.c -o af_tracer -lm
+m68k-amigaos-gcc -noixemul -O2 -m68020 -m68881 free.c image.c load.c math.c tracer.c write.c -o af_tracer -lm
+
+af_tracer pyrs pyrsopts 4
+
+convert -depth 8 -size 640x400 gray:pyrs.red gray:pyrs.grn gray:pyrs.blu -combine pyrs.jpg && display pyrs.jpg
+
+
+* in load.c around line 126
+fscanf(fp, "%hd\n", &nvert);   // Alexander: %hd as nvert is short!
+
+* and around line 183
+fscanf(fp, "%hd ", &polys[npoly].vtx[i]);  // Alexander: vtx is *SHORT !
+
+otherwize tracer complains about not enough memory because nvert is zero after the fscanf()
+
+
+11.Sep 2024
+-----------
+The pyrs-File
+
+3DG1                    Identifier
+10                      Number of vertices (points)
+0 750 0                 Coordinates of the 10 points
+750 -750 -750
+-750 -750 -750
+750 -750 750
+-750 -750 750
+-750 2231 -750
+750 2231 -750
+0 731 0
+750 2231 750
+-750 2231 750
+3 0 1 2 9               Polygons
+| ----- |
+|   |   +--------------- Color (Red)
+|   +------------------- The 3 vertices (points) as defined above
++----------------------- Number of vertices (points) that follow
+3 0 3 1 12
+3 0 4 3 12
+3 0 2 4 12
+4 2 1 3 4 12
+3 5 6 7 10
+3 6 8 7 10
+3 8 9 7 10
+3 9 5 7 10
+4 9 8 6 5 10
+
+Color codes:
+0 = black
+1 = blue
+2 = green
+3 = unused
+4 = red
+5 = unused
+6 = brown
+7 = grey
+8 = black
+9 = blue
+10 = green
+11 = unused
+12 = red
+13 = unused
+14 = yellow
+15 = white
+
+
+
+# cow from lwtoy: iff_structure_linux: Points start wit "0001)", Polygons start with pols_00000
+~/Desktop/SelcoGit/af_iff_structure/iff_structure_linux ~/Desktop/lwtoy/lwtoy_demo/lwobj/Cow | awk 'BEGIN{print "3DG1"; print "3001"} /^ +[0-9]+)/{print $2*1200, $3*1200, $4*1200; next;} /^pols_[0-9]+/{gsub(/^pols_[0-9]+/,"",$0); print $0;}' >cow
+
+
+13.Sep 2024
+-----------
+# Ich will die Kuh um -45 Grad an der y-Achse drehen:
+~/Desktop/SelcoGit/af_iff_structure/iff_structure_linux ~/Desktop/lwtoy/lwtoy_demo/lwobj/Cow | awk 'BEGIN{print "3DG1"; print "3001"}' > cow_yminus45
+~/Desktop/SelcoGit/af_iff_structure/iff_structure_linux ~/Desktop/lwtoy/lwtoy_demo/lwobj/Cow | awk '/^ +[0-9]+)/{print $2*1200, $3*1200, $4*1200, 0, -45, 0; next;}' | ~/Desktop/SelcoGit/af_rotatepoints/Debug/af_rotatepoints >> cow_yminus45
+~/Desktop/SelcoGit/af_iff_structure/iff_structure_linux ~/Desktop/lwtoy/lwtoy_demo/lwobj/Cow | awk '/^pols_[0-9]+/{gsub(/^pols_[0-9]+/,"",$0); print $0;}' >>cow_yminus45
+
+convert -depth 8 -size 640x400 gray:cow_yminus45.red gray:cow_yminus45.grn gray:cow_yminus45.blu -combine cow_yminus45.jpg && display cow_yminus45.jpg
+
+# -135
+~/Desktop/SelcoGit/af_iff_structure/iff_structure_linux ~/Desktop/lwtoy/lwtoy_demo/lwobj/Cow | awk 'BEGIN{print "3DG1"; print "3001"}' > cow_yminus135
+~/Desktop/SelcoGit/af_iff_structure/iff_structure_linux ~/Desktop/lwtoy/lwtoy_demo/lwobj/Cow | awk '/^ +[0-9]+)/{print $2*1200, $3*1200, $4*1200, 0, -135, 0; next;}' | ~/Desktop/SelcoGit/af_rotatepoints/Debug/af_rotatepoints >> cow_yminus135
+~/Desktop/SelcoGit/af_iff_structure/iff_structure_linux ~/Desktop/lwtoy/lwtoy_demo/lwobj/Cow | awk '/^pols_[0-9]+/{gsub(/^pols_[0-9]+/,"",$0); print $0;}' >>cow_yminus135
+
+convert -depth 8 -size 640x400 gray:cow_yminus45.red gray:cow_yminus135.grn gray:cow_yminus135.blu -combine cow_yminus135.jpg && display cow_yminus135.jpg
+
+16.Sep 2024
+-----------
+Bounding Box um die Kuh zur schnellen Berechnung:
+Achtung: Indizes in die Punktetabelle beginnen mit 0!
+
+cat cowopts
+-----------
+-1000 0 2500
+0 0 0
+1.0
+-3000 4500 5000
+1000 1000
+-750
+500
+
+convert -depth 8 -size 640x400 gray:cow.red gray:cowbox.grn gray:cowbox.blu -combine cowbox.jpg && display cowbox.jpg
+(reverse-i-search)`iff': ~/Desktop/SelcoGit/af_iff_structure/iff_structure_linux ~/Desktop/lwtoy/lwtoy_demo/lwobj/Cow | awk 'BEGIN{xmin=1000000;xmax=-1000000;ymin=xmin;ymax=xmax;zmin=xmin;zmax=xmax;} /^ +[0-9]+)/{x=$2*1200; y=$3*1200; z=$4*1200; if(x<xmin){xmin=x;}else if(x>xmax){xmax=x;} if(y<ymin){ymin=y;}else if(y>ymax){ymax=y;}if(z<zmin){zmin=z;}else if(z>zmax){zmax=z;}next;} END{ printf("xmin=%d xmax=%d\n",xmin,xmax);printf("ymin=%d ymax=%d\n",ymin,ymax);printf("zmin=%d zmax=%d\n",zmin,zmax); printf("\nBounding Box\n------------\n");printf("3DG1\n8\n");printf("%f %f %f\n",xmin,ymin,zmax);printf("%f %f %f\n",xmax,ymin,zmax);printf("%f %f %f\n",xmax,ymax,zmax);printf("%f %f %f\n",xmin,ymax,zmax);printf("%f %f %f\n",xmin,ymin,zmin);printf("%f %f %f\n",xmax,ymin,zmin);printf("%f %f %f\n",xmax,ymax,zmin);printf("%f %f %f\n",xmin,ymax,zmin);printf("4 %u %u %u %u %u\n",0,1,2,3,7);printf("4 %u %u %u %u %u\n",4,5,6,7,7);printf("4 %u %u %u %u %u\n",0,1,5,4,7);printf("4 %u %u %u %u %u\n",3,2,6,7,7);printf("4 %u %u %u %u %u\n",0,4,7,3,4);printf("4 %u %u %u %u %u\n",1,5,6,2,7);}'
+
+
+./rotate.sh creates cow_xxx for rotation animation.
+
+# Script fuer den Amiga erzegen, dort mit execute amiga_rotation starten
+for DEG in $(seq 0 12 360 );do DEGREES=$(printf "%03d" $DEG); echo "af_tracer cowbox_$DEGREES cowopts 4"; done >amiga_rotation

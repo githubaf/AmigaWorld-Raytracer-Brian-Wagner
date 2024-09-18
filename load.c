@@ -111,6 +111,8 @@ CHAR *file;
 
    fscanf(fp, "%4s\n", id);
 
+printf("Alexander: id=%s\n",id);
+
    if (ferror(fp)) {
       fclose(fp);
 
@@ -127,7 +129,10 @@ CHAR *file;
       return(2);
    }
 
-   fscanf(fp, "%d\n", &nvert);
+   fscanf(fp, "%hd\n", &nvert);   // Alexander: %hd as nvert is short!
+
+
+printf("Alexander: nvert=%d\n",nvert);
 
    if (ferror(fp)) {
       fclose(fp);
@@ -163,7 +168,7 @@ CHAR *file;
 
          return(1);
       }
-
+printf("Alexander: cnt=%d\n",cnt);
       polys[npoly].cnt = cnt;
 
       polys[npoly].vtx = AllocMem(cnt * 2, MEMF_CLEAR);
@@ -175,7 +180,7 @@ CHAR *file;
       }
 
       for (i = 0; i < cnt; i++) {
-         fscanf(fp, "%d ", &polys[npoly].vtx[i]);
+         fscanf(fp, "%hd ", &polys[npoly].vtx[i]);  // Alexander: vtx is *SHORT !
 
          if (ferror(fp)) {
             fclose(fp);

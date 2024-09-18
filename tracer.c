@@ -72,7 +72,7 @@ CHAR **argv;
    IntuitionBase = (VOID *)OpenLibrary("intuition.library", NULL);
 
    if (IntuitionBase == NULL) {
-      CloseLibrary(GfxBase);
+      CloseLibrary((struct Library*)GfxBase);
 
       puts("Unable to open intuition.library");
 
@@ -86,9 +86,9 @@ CHAR **argv;
    polys = AllocMem(size1, MEMF_CLEAR);
 
    if (polys == NULL) {
-      CloseLibrary(IntuitionBase);
+      CloseLibrary((struct Library*)IntuitionBase);
 
-      CloseLibrary(GfxBase);
+      CloseLibrary((struct Library*)GfxBase);
 
       puts("Unable to allocate 'polys' buffer");
 
@@ -102,9 +102,9 @@ CHAR **argv;
    if (verts == NULL) {
       FreeMem(polys, size1);
 
-      CloseLibrary(IntuitionBase);
+      CloseLibrary((struct Library*)IntuitionBase);
 
-      CloseLibrary(GfxBase);
+      CloseLibrary((struct Library*)GfxBase);
 
       puts("Unable to allocate 'verts' buffer");
 
@@ -117,7 +117,7 @@ CHAR **argv;
       scrw = 320;
       scrh = 200;
 
-      vmod = NULL;
+      vmod = 0;
    } else
 
    if (scrm == 2) {
@@ -158,9 +158,9 @@ CHAR **argv;
 
       FreeMem(polys, size1);
 
-      CloseLibrary(IntuitionBase);
+      CloseLibrary((struct Library*)IntuitionBase);
 
-      CloseLibrary(GfxBase);
+      CloseLibrary((struct Library*)GfxBase);
 
       puts("Unable to allocate RGB buffers");
 
@@ -194,9 +194,9 @@ CHAR **argv;
 
       FreeMem(polys, size1);
 
-      CloseLibrary(IntuitionBase);
+      CloseLibrary((struct Library*)IntuitionBase);
 
-      CloseLibrary(GfxBase);
+      CloseLibrary((struct Library*)GfxBase);
 
       puts("Unable to open screen");
 
@@ -237,9 +237,9 @@ CHAR **argv;
 
       FreeMem(polys, size1);
 
-      CloseLibrary(IntuitionBase);
+      CloseLibrary((struct Library*)IntuitionBase);
 
-      CloseLibrary(GfxBase);
+      CloseLibrary((struct Library*)GfxBase);
 
       puts("Unable to open window");
 
@@ -286,9 +286,9 @@ CHAR **argv;
 
       FreeMem(polys, size1);
 
-      CloseLibrary(IntuitionBase);
+      CloseLibrary((struct Library*)IntuitionBase);
 
-      CloseLibrary(GfxBase);
+      CloseLibrary((struct Library*)GfxBase);
 
       if (err == 1) puts("DOS Error loading object");
       else
@@ -322,9 +322,9 @@ CHAR **argv;
 
       FreeMem(polys, size1);
 
-      CloseLibrary(IntuitionBase);
+      CloseLibrary((struct Library*)IntuitionBase);
 
-      CloseLibrary(GfxBase);
+      CloseLibrary((struct Library*)GfxBase);
 
       puts("DOS error loading view file");
 
@@ -357,9 +357,9 @@ CHAR **argv;
 
    FreeMem(polys, size1);
 
-   CloseLibrary(IntuitionBase);
+   CloseLibrary((struct Library*)IntuitionBase);
 
-   CloseLibrary(GfxBase);
+   CloseLibrary((struct Library*)GfxBase);
 
    return;
 }

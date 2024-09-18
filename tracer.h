@@ -1,5 +1,5 @@
-#define MAXPOLYS  1500
-#define MAXVERTS  1500
+#define MAXPOLYS  60000 //1500
+#define MAXVERTS  60000 //1500
 
 #define HUGE 1.0e+12
 
